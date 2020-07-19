@@ -22,8 +22,8 @@ BILLYJOEL = "37i9dQZF1DWY7QTKRRDgA5"
 EVANS = "37i9dQZF1DZ06evO2wKKgo"
 
 access_token <- get_spotify_access_token(CLIENT_ID, CLIENT_SECRET)
-reference_playlist <- get_playlist(COLTRANE, authorization=access_token)
-target_playlist <- get_playlist(BILLYJOEL, authorization=access_token)
+reference_playlist <- get_playlist(EVANS, authorization=access_token)
+target_playlist <- get_playlist(DRAGONFORCE, authorization=access_token)
 
 pca_list <- cross_playlist_pca(reference_playlist, target_playlist)
 reference_pcs <- pca_list$Reference

@@ -1,6 +1,15 @@
 library(glue)
 library(httr)
 
+## Function for retrieving ONLY the playlist name.  Not from spotifyr, and separate from the main
+## get_playlist function for usability purposes.
+get_playlist_name <- function(playlist_id, authorization=get_spotify_access_token()){
+    name_response <- query_playlist(str_glue('https://api.spotify.com/v1/playlists/{playlist_id}'),
+                                    params=list(access_token=authorization, fields=c("name")))
+    return(name_response$name)
+}
+
+
 ## Correctly format the tracks' artists.  Not from spotifyr.
 get_artists <- function(artists){
     return(artists %>% lapply(function(x){paste(x$name, collapse=", ")}) %>% unlist)
@@ -35,7 +44,7 @@ get_playlist <- function(playlist_id, fields=NULL, market=NULL,
     )
     
     # stopping is built into query_playlist()
-    init_query <- get_first_batch(url, params, access_token)
+    init_query <- get_first_batch(url, params)
     
     n_tracks <- pluck(init_query, "tracks", "total")
     
@@ -49,7 +58,7 @@ get_playlist <- function(playlist_id, fields=NULL, market=NULL,
         # create page urls
         page_urls <- str_glue("{url}/tracks?offset={offsets}&limit=100")
         # query api
-        other_pages <- map(page_urls, get_playlist_batch, params, access_token)
+        other_pages <- map(page_urls, get_playlist_batch, params)
         # merge the song track results
         all_items <- bind_rows(
             pluck(init_query, "tracks", "items"),
@@ -71,10 +80,10 @@ get_playlist <- function(playlist_id, fields=NULL, market=NULL,
 }
 
 ## Gets the data for the (up to) first 100 tracks from a Spotify playlist.
-get_first_batch <- function(url, playlist_params, access_token){
+get_first_batch <- function(url, playlist_params){
     first_batch <- query_playlist(url, playlist_params)
     ids <- first_batch$tracks$items$track.id
-    audio_features <- get_track_audio_features(ids, authorization = access_token)
+    audio_features <- get_track_audio_features(ids, authorization = playlist_params$access_token)
     audio_features <- audio_features %>% select(acousticness, danceability, energy, valence, tempo)
     first_batch$tracks$items <- cbind(first_batch$tracks$items, audio_features)
     return(first_batch)
@@ -82,10 +91,10 @@ get_first_batch <- function(url, playlist_params, access_token){
 
 ## Gets the data for any tracks beyond the first 100 from a Spotify playlist.  This was splist from
 ## get_first_batch() due to differences in the structure of what the API's playlist query returns.
-get_playlist_batch <- function(url, playlist_params, access_token, first = FALSE){
+get_playlist_batch <- function(url, playlist_params){
     playlist_batch <- query_playlist(url, playlist_params)
     ids <- playlist_batch$items$track.id
-    audio_features <- get_track_audio_features(ids, authorization = access_token)
+    audio_features <- get_track_audio_features(ids, authorization = playlist_params$access_token)
     audio_features <- audio_features %>% select(acousticness, danceability, energy, valence, tempo)
     playlist_batch$items <- cbind(playlist_batch$items, audio_features)
     return(playlist_batch)

@@ -42,7 +42,7 @@ two_component_variance <- function(pca){
 create_tracks_ggplot <- function(dataset){
     max_PC1 <- ceiling(max(abs(dataset$PC1)))
     max_PC2 <- ceiling(max(abs(dataset$PC2)))
-    g <- ggplot(data=dataset, aes(x=PC1, y=PC2, color=Playlist)) +
+    g <- ggplot(data=dataset, aes(x=PC1, y=PC2, color=Playlist)) + 
         geom_point(aes(text=SongInfo)) + scale_color_manual(values=c("#FF4444", "lightgreen", "darkgreen")) +
         theme(legend.position = "bottom", legend.title=element_blank()) + 
         xlim(-max_PC1, max_PC1) + ylim(-max_PC2, max_PC2)
