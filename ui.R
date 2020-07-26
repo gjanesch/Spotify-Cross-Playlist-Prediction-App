@@ -1,3 +1,7 @@
+## Gregory Janesch, last modified 2020-07-26
+## Description: UI code for the Spotify Shiny app.
+
+
 library(shinydashboard)
 library(plotly)
 library(DT)
@@ -20,7 +24,7 @@ pc_box = box(width=5,
 ###################################################################################################
 
 
-# Define UI for application that draws a histogram
+# Define UI; use two of the playlists from the example script as defaults for the playlist inputs.
 dashboardPage(
     title="Spotify Cross-Playlist Predictions",
     skin="green",

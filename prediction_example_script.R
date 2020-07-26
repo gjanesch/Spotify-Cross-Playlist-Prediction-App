@@ -1,10 +1,7 @@
-## Links:
-# https://github.com/joelcponte/shiny-app-spotify (similar example to what I'm doing now)
-# https://www.statworx.com/de/blog/how-to-dockerize-shinyapps/
-# https://developer.spotify.com/documentation/web-api/reference/tracks/get-audio-features/ (page for)
+## Gregory Janesch, last modified 2020-07-26
+## Description: Script designed to go through the full process of downloading playlist data
+## and analyzing it.  This is meant to be used as a basis for the Shiny app.
 
-## FUTURE INCLUSIONS:
-## - Note if there are too few elements in a playlist
 
 library(glue)
 library(jsonlite)
@@ -30,9 +27,8 @@ reference_pcs <- pca_list$Reference
 target_pcs <- pca_list$Target
 two_component_variance(pca_list$PCA)
 
-## From here, things split into two directions - one for generating the plot
-## from the principal components and one for calculating and returning the
-## predictions.
+## From here, things split into two directions - one for generating the plot from the principal
+## components and one for calculating and returning the predictions.
 
 ## PART 1: The predictions
 closest_target_indices <- calculate_closest_songs(reference_pcs, target_pcs)
@@ -42,7 +38,6 @@ recommended_songs <- target_playlist[closest_target_indices,]
 p <- principal_components_ggplot(pca_list$PCA$rotation)
 
 ## Part 2b: Plotting the data
-
 reference_pcs <- reference_pcs %>%
     mutate(SongInfo = reference_playlist$SongInfo, Playlist="Reference")
 

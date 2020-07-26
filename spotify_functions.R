@@ -1,3 +1,9 @@
+## Greg Janesch, last modified 2020-07-26
+## Description: Functions for acquiring and transforming data from Spotify.  Much of this is copied
+## from the code of the spotifyr package, which was not active on CRAN at the time but still 
+## available on GitHub.
+
+
 library(glue)
 library(httr)
 
@@ -15,8 +21,8 @@ get_artists <- function(artists){
     return(artists %>% lapply(function(x){paste(x$name, collapse=", ")}) %>% unlist)
 }
 
-## Gets an access token for API access.  Must be refreshed after 60 minutes.
-## This function is copied from the spotifyr package.
+## Gets an access token for API access.  Must be refreshed after 60 minutes. This function is
+## copied from the spotifyr package.
 get_spotify_access_token <- function(client_id, client_secret) {
     post <- RETRY('POST', 'https://accounts.spotify.com/api/token',
                   accept_json(), authenticate(client_id, client_secret),
@@ -31,9 +37,8 @@ get_spotify_access_token <- function(client_id, client_secret) {
 
 
 ## Gets information on a playlist and the tracks that comprise it, including audio features of the
-## latter.
-## This is mostly a copy from spotifyr, with added code to get track info and filter columns that
-## aren't wanted.
+## latter.  This is mostly a copy from spotifyr, with added code to get track info and filter
+## columns that aren't wanted.
 get_playlist <- function(playlist_id, fields=NULL, market=NULL, 
                          authorization=get_spotify_access_token()) {
     url <- str_glue('https://api.spotify.com/v1/playlists/{playlist_id}')
@@ -72,7 +77,8 @@ get_playlist <- function(playlist_id, fields=NULL, market=NULL,
     struct <- structure(init_query, class = c("playlist", "list"))
     
     playlist <- struct$tracks$items %>%
-        select(track.name, track.artists, track.album.name, track.duration_ms, acousticness:tempo) %>%
+        select(track.name, track.artists, track.album.name, track.duration_ms,
+               acousticness:tempo) %>%
         mutate(track.artists = get_artists(track.artists)) %>% na.omit %>%
         mutate(SongInfo = glue("\"{track.name}\"<br>{track.artists}<br><i>{track.album.name}</i>"))
     
@@ -100,8 +106,8 @@ get_playlist_batch <- function(url, playlist_params){
     return(playlist_batch)
 }
 
-## Function for submitting a general query to the Spotify API, despite the function name.
-## Copied from the spotifyr package.
+## Function for submitting a general query to the Spotify API, despite the function name.  Copied
+## from the spotifyr package.
 query_playlist <- function(url, params) {
     res <- RETRY('GET', url, query = params, encode = 'json')
     stop_for_status(res)
@@ -109,19 +115,14 @@ query_playlist <- function(url, params) {
     res
 }
 
-## Gets the audio features of up to 100 tracks.
-## Copied from the spotifyr package.
+## Gets the audio features of up to 100 tracks.  Copied from the spotifyr package.
 get_track_audio_features <- function(ids, authorization = get_spotify_access_token()) {
     stopifnot(length(ids) <= 100)
     base_url <- 'https://api.spotify.com/v1/audio-features'
-    params <- list(
-        access_token = authorization,
-        ids = paste0(ids, collapse = ',')
-    )
+    params <- list(access_token = authorization, ids = paste0(ids, collapse = ','))
     res <- RETRY('GET', base_url, query = params, encode = 'json')
     stop_for_status(res)
     res <- fromJSON(content(res, as = 'text', encoding = 'UTF-8'), flatten = TRUE) %>%
-        .$audio_features %>%
-        as_tibble()
+               .$audio_features %>% as_tibble()
     return(res)
 }

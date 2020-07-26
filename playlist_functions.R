@@ -1,3 +1,8 @@
+## Greg Janesch, last modified 2020-07-26
+## Description: Functions for analyzing the playlist data returned by Spotify and generating
+## revelvant plots.
+
+
 ## Takes dataframes containing the playlists' data, performs PCA on the reference playlist, then
 ## uses it to predict how the target playlist looks.
 cross_playlist_pca <- function(reference, target){
@@ -9,10 +14,9 @@ cross_playlist_pca <- function(reference, target){
 }
 
 
-## Takes the principal components from the reference and target playlists and
-## returns the indices for the n_target songs from the target playlist that are
-## closest to the reference songs.  Closeness is determined by the sum of the
-## Euclidean distances to the nearest n_reference tracks.
+## Takes the principal components from the reference and target playlists and returns the indices
+## for the n_target songs from the target playlist that are closest to the reference songs.
+## Closeness is determined by the sum of the Euclidean distances to the nearest n_reference tracks.
 calculate_closest_songs <- function(reference_pcs, target_pcs, n_reference=5, n_target=5){
     indices <- expand.grid(RefIndex=1:nrow(reference_pcs), TargetIndex=1:nrow(target_pcs))
     distances <- indices %>% mutate(RefPC1 = reference_pcs[RefIndex, "PC1"],
@@ -36,16 +40,17 @@ two_component_variance <- function(pca){
 }
 
 
-## Takes the principal components predictions from both playlists and plots them on a scatter
-## plot for visualization.  The output can be used for Plotly plots, but should have additional
+## Takes the principal components predictions from both playlists and plots them on a scatter plot
+## for visualization.  The output can be used for Plotly plots, but should have additional
 ## formatting to make it match this.
 create_tracks_ggplot <- function(dataset){
     max_PC1 <- ceiling(max(abs(dataset$PC1)))
     max_PC2 <- ceiling(max(abs(dataset$PC2)))
     g <- ggplot(data=dataset, aes(x=PC1, y=PC2, color=Playlist)) + 
-        geom_point(aes(text=SongInfo)) + scale_color_manual(values=c("#FF4444", "lightgreen", "darkgreen")) +
-        theme(legend.position = "bottom", legend.title=element_blank()) + 
-        xlim(-max_PC1, max_PC1) + ylim(-max_PC2, max_PC2)
+             geom_point(aes(text=SongInfo)) +
+             scale_color_manual(values=c("#FF4444", "lightgreen", "darkgreen")) +
+             theme(legend.position = "bottom", legend.title=element_blank()) + 
+             xlim(-max_PC1, max_PC1) + ylim(-max_PC2, max_PC2)
     return(g)
 }
 
