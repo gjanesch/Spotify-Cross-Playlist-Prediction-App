@@ -2,6 +2,6 @@ This contains code for an app designed to make song recommendations from a Spoti
 
 Requires the tidyverse and Plotly.  Does not rely on `spotifyr`, as it was temporarily unavailable while I coded this up, though it does copy several functions from it.
 
-The app can be viewed [here](http://3.85.216.75:3838/).
+The app can be viewed [here](http://3.231.4.28:3838/).
 
 NOTE: The file "client_info.R" contains the API keys for accessing Spotify, and as such is not included in this repository; you'll need to generate your own.
